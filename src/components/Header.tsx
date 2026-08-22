@@ -4,7 +4,8 @@ import {
   Target, 
   Download,
   Flame,
-  CheckCircle2
+  CheckCircle2,
+  Sparkles
 } from 'lucide-react';
 
 export type ActiveTab = 
@@ -30,21 +31,21 @@ export const Header: React.FC<HeaderProps> = ({
   const navTabs: Array<{ id: ActiveTab; label: string; icon: React.ReactNode; badge?: string | number; badgeColor?: string }> = [
     { 
       id: 'personality_matrix', 
-      label: 'Likert Scale (500)', 
+      label: 'Questionnaire', 
       icon: <Target className="w-4 h-4" />,
       badge: `${likertAnsweredCount}/500`,
       badgeColor: likertAnsweredCount === 500 ? 'bg-emerald-600 text-white' : likertAnsweredCount > 0 ? 'bg-teal-600 text-white' : 'bg-slate-100 text-slate-500'
     },
     { 
       id: 'parameters', 
-      label: '20 Trait Parameters', 
+      label: 'Your Traits & Profile', 
       icon: <Sliders className="w-4 h-4" />,
-      badge: likertAnsweredCount > 0 ? 'Active' : undefined,
+      badge: likertAnsweredCount > 0 ? `${completionPercentage}% Ready` : undefined,
       badgeColor: 'bg-indigo-50 text-indigo-700 border border-indigo-200'
     },
     { 
       id: 'exports', 
-      label: 'Export Dataset Hub', 
+      label: 'Export & Training', 
       icon: <Download className="w-4 h-4" />,
     },
   ];
@@ -58,15 +59,15 @@ export const Header: React.FC<HeaderProps> = ({
           onClick={() => setActiveTab('personality_matrix')}
           className="flex items-center gap-2.5 text-left focus:outline-none group"
         >
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-teal-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-xs">
-            16P
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-teal-500 to-indigo-600 flex items-center justify-center text-white font-bold text-xs shadow-xs">
+            <Sparkles className="w-4 h-4" />
           </div>
           <div>
             <span className="text-sm sm:text-base font-bold text-slate-900 tracking-tight block leading-tight">
-              16Personalities Likert Engine
+              Life & Personality Assessment
             </span>
             <span className="text-[10px] text-slate-400 font-medium hidden sm:block">
-              Self-Contained Cognitive Profiling & Dataset Builder
+              Casual Questionnaire & Cognitive Profile Builder
             </span>
           </div>
         </button>
@@ -107,10 +108,11 @@ export const Header: React.FC<HeaderProps> = ({
           className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-200 rounded-xl text-xs font-bold transition shadow-2xs"
         >
           <Download className="w-3.5 h-3.5 text-teal-600" />
-          <span>LLM Export ({completionPercentage}%)</span>
+          <span>Export Dataset ({completionPercentage}%)</span>
         </button>
       </div>
 
     </header>
   );
 };
+
