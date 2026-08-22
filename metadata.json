@@ -1,0 +1,6 @@
+{
+  "name": "Cognitive Apprenticeship — Identity Dataset Builder",
+  "description": "Conversational cognitive profiling and training dataset generator that models decision-making, engineering judgment, curiosity, and produces JSONL fine-tuning datasets.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
