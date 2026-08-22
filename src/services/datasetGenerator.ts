@@ -94,7 +94,7 @@ export function generateFineTuningDataset(state: FullCognitiveState): CompiledFi
   const userName = state.user_name || 'Sambit';
   const now = new Date().toISOString();
   
-  const { parameters, domainScores, completionStats } = computeParametersFromLikert(responses);
+  const { parameters, completionStats } = computeParametersFromLikert(responses);
   
   // Build a concise system prompt summarizing the user's derived parameters
   const topHighPoles = parameters

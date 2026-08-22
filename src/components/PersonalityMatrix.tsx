@@ -25,16 +25,16 @@ interface PersonalityMatrixProps {
 }
 
 const DOMAIN_LABELS: Record<LikertDomain, { name: string; short: string; desc: string }> = {
-  engineering_philosophy: { name: 'Engineering Philosophy', short: '1. Philosophy', desc: 'Simplicity, abstractions, tech debt, and architecture.' },
-  decision_and_tradeoffs: { name: 'Decisions & Trade-offs', short: '2. Decisions', desc: 'Reversibility, speed vs certainty, and consensus.' },
-  problem_solving_heuristics: { name: 'Problem Solving', short: '3. Problem Solving', desc: 'First principles, root cause debugging, and bisection.' },
-  risk_and_uncertainty: { name: 'Risk & Uncertainty', short: '4. Risk', desc: 'Ambiguity tolerance, blast radius, and composure.' },
-  epistemic_updating: { name: 'Epistemic Updating', short: '5. Epistemic', desc: 'Bayesian updating, intellectual humility, and skepticism.' },
-  interpersonal_and_candor: { name: 'Interpersonal & Candor', short: '6. Candor', desc: 'Radical candor, direct feedback, and debate posture.' },
-  curiosity_and_depth: { name: 'Curiosity & Depth', short: '7. Curiosity', desc: 'Inquisitiveness, synthesis, and toy prototypes.' },
-  stress_and_resilience: { name: 'Stress & Resilience', short: '8. Resilience', desc: 'Incident equanimity, deadline crunch, and ownership.' },
-  execution_and_velocity: { name: 'Execution & Velocity', short: '9. Velocity', desc: 'Bias for action, MVP shipping cadence, and flow.' },
-  autonomy_and_work_ethic: { name: 'Autonomy & Agency', short: '10. Autonomy', desc: 'Self-direction, craft pride, and extreme agency.' },
+  engineering_philosophy: { name: 'Life Values & Authenticity', short: '1. Values', desc: 'Simplicity, staying true to yourself, peace of mind, and personal ethics.' },
+  decision_and_tradeoffs: { name: 'Everyday Decisions & Choices', short: '2. Decisions', desc: 'How you make choices, trusting your gut, planning vs spontaneity.' },
+  problem_solving_heuristics: { name: 'Practical Resourcefulness', short: '3. Resourcefulness', desc: 'Everyday dilemmas, fixing things at home, simple common-sense solutions.' },
+  risk_and_uncertainty: { name: 'Comfort Zone & Adventure', short: '4. Adventure', desc: 'Trying new things, taking personal leaps, and handling the unexpected.' },
+  epistemic_updating: { name: 'Open-Mindedness & Growth', short: '5. Open-Mindedness', desc: 'Changing your mind, admitting mistakes, and listening to other views.' },
+  interpersonal_and_candor: { name: 'Relationships & Honesty', short: '6. Relationships', desc: 'Direct honesty, handling conflict with loved ones, and setting boundaries.' },
+  curiosity_and_depth: { name: 'Curiosity & Passions', short: '7. Curiosity', desc: 'Hobbies, late-night rabbit holes, creative projects, and learning for fun.' },
+  stress_and_resilience: { name: 'Patience & Emotional Calm', short: '8. Resilience', desc: 'Staying level-headed during disruptions, delays, and unexpected chaos.' },
+  execution_and_velocity: { name: 'Daily Habits & Action', short: '9. Daily Habits', desc: 'Beating procrastination, keeping promises to yourself, and daily routines.' },
+  autonomy_and_work_ethic: { name: 'Independence & Freedom', short: '10. Independence', desc: 'Living on your own terms, saying no without guilt, and self-reliance.' },
 };
 
 /**

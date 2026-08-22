@@ -31,13 +31,14 @@ interface ParameterEngineProps {
 }
 
 const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  engineering: { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
-  decision: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
-  epistemic: { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
-  communication: { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
-  execution: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
-  stress: { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200' },
+  daily_habits: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+  lifestyle: { bg: 'bg-indigo-50', text: 'text-indigo-700', border: 'border-indigo-200' },
+  decisions: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+  relationships: { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
+  mindset: { bg: 'bg-purple-50', text: 'text-purple-700', border: 'border-purple-200' },
+  emotional_resilience: { bg: 'bg-teal-50', text: 'text-teal-700', border: 'border-teal-200' },
   agency: { bg: 'bg-cyan-50', text: 'text-cyan-700', border: 'border-cyan-200' },
+  curiosity: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' },
 };
 
 export const ParameterEngine: React.FC<ParameterEngineProps> = ({
@@ -62,7 +63,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
     }
   };
 
-  const categories = ['all', 'engineering', 'decision', 'epistemic', 'communication', 'execution', 'stress', 'agency'];
+  const categories = ['all', 'daily_habits', 'lifestyle', 'decisions', 'relationships', 'mindset', 'emotional_resilience', 'agency', 'curiosity'];
 
   const filteredParamKeys = (Object.keys(PARAMETER_METADATA) as PersonalityParameterKey[]).filter(key => {
     const meta = PARAMETER_METADATA[key];
@@ -82,13 +83,13 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
               </span>
               <div>
                 <h1 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                  Model Parameter & Behavioral Vector Engine
+                  Personality & Decision Parameters
                   <span className="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full font-mono font-semibold">
-                    20 Active Hyper-Dimensions
+                    20 Active Traits
                   </span>
                 </h1>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Parameters mathematically calibrated from 500 psychometric items. Used to guide the LoRA fine-tuning process.
+                  Your core traits calculated from 500 personal life and decision-making questions.
                 </p>
               </div>
             </div>
@@ -109,7 +110,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
               className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5"
             >
               <Zap className="w-4 h-4" />
-              <span>Export LLM Dataset Hub</span>
+              <span>Export Profile & Data</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
@@ -126,7 +127,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
             }`}
           >
             <Sliders className="w-3.5 h-3.5" />
-            <span>20 Parameter Vectors</span>
+            <span>20 Personality Traits</span>
           </button>
 
           <button
@@ -138,7 +139,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
             }`}
           >
             <Brain className="w-3.5 h-3.5" />
-            <span>Behavioral Narrative Profile</span>
+            <span>Personal Profile & Tenets</span>
             {narrative && (
               <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
             )}
@@ -153,7 +154,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
             }`}
           >
             <Terminal className="w-3.5 h-3.5" />
-            <span>Fine-Tuning System Directive</span>
+            <span>Custom AI Persona Directive</span>
           </button>
         </div>
       </div>
@@ -177,7 +178,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                         : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
                     }`}
                   >
-                    {cat}
+                    {cat.replace('_', ' ')}
                   </button>
                 ))}
               </div>
@@ -187,8 +188,8 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                 {filteredParamKeys.map(key => {
                   const meta = PARAMETER_METADATA[key];
                   const paramObj = parameters[key];
-                  const value = typeof paramObj === 'object' && paramObj !== null ? paramObj.value : (paramObj ?? meta.default_baseline);
-                  const catColor = CATEGORY_COLORS[meta.category] || CATEGORY_COLORS.engineering;
+                  const value = typeof paramObj === 'object' && paramObj !== null ? paramObj.value : (paramObj ?? 50);
+                  const catColor = CATEGORY_COLORS[meta.category] || CATEGORY_COLORS.lifestyle;
 
                   return (
                     <div
@@ -198,7 +199,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-1.5">
                           <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${catColor.bg} ${catColor.text} ${catColor.border}`}>
-                            {meta.category}
+                            {meta.category.replace('_', ' ')}
                           </span>
                           <span className="font-mono text-sm font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">
                             {value}/100
@@ -243,9 +244,9 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
               {!narrative ? (
                 <div className="bg-white rounded-xl border border-slate-200 p-12 text-center max-w-xl mx-auto shadow-xs">
                   <Brain className="w-12 h-12 text-indigo-500 mx-auto mb-4" />
-                  <h2 className="text-lg font-bold text-slate-900">Behavioral Narrative Not Yet Synthesized</h2>
+                  <h2 className="text-lg font-bold text-slate-900">Personal Profile Not Yet Generated</h2>
                   <p className="text-xs text-slate-500 mt-1 mb-6 leading-relaxed">
-                    Click the button below to translate your 500-question responses and cognitive observations into a definitive mental operating system profile.
+                    Click the button below to translate your 500 questionnaire responses into your personal cognitive profile and life tenets.
                   </p>
                   <button
                     onClick={onSynthesizeNarrative}
@@ -253,7 +254,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                     className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow-xs transition inline-flex items-center gap-2"
                   >
                     <Sparkles className="w-4 h-4" />
-                    <span>{isSynthesizing ? 'Synthesizing...' : 'Synthesize Behavioral Narrative Now'}</span>
+                    <span>{isSynthesizing ? 'Calculating...' : 'Generate Personal Profile Now'}</span>
                   </button>
                 </div>
               ) : (
@@ -261,7 +262,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                   {/* Hero Archetype Banner */}
                   <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-2xl p-6 text-white shadow-md border border-indigo-900/50">
                     <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold uppercase tracking-wider mb-2">
-                      <Sparkles className="w-4 h-4" /> Synthesized Cognitive Archetype
+                      <Sparkles className="w-4 h-4" /> Personal Archetype
                     </div>
                     <h2 className="text-2xl font-black tracking-tight text-white">
                       {narrative.archetype_title}
@@ -271,7 +272,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                     </p>
                     <div className="mt-4 pt-4 border-t border-indigo-800/60 flex items-center justify-between text-xs text-indigo-300 font-mono">
                       <span>Generated: {new Date(narrative.generated_at).toLocaleString()}</span>
-                      <span className="text-emerald-400 font-bold">Ready for LoRA Calibration</span>
+                      <span className="text-emerald-400 font-bold">Active Profile</span>
                     </div>
                   </div>
 
@@ -279,7 +280,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                   <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
                     <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 mb-2">
                       <Compass className="w-4 h-4 text-indigo-600" />
-                      Cognitive DNA & Reasoning Architecture
+                      Core Mindset & Decision Architecture
                     </h3>
                     <p className="text-xs text-slate-700 leading-relaxed">
                       {narrative.cognitive_dna_summary}
@@ -292,10 +293,10 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                     <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col">
                       <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 mb-3">
                         <Code2 className="w-4 h-4 text-indigo-600" />
-                        Core Engineering Tenets
+                        Core Life Tenets
                       </h3>
                       <div className="space-y-2.5 flex-1">
-                        {narrative.core_engineering_tenets?.map((tenet, i) => (
+                        {(narrative.core_life_tenets || narrative.core_engineering_tenets)?.map((tenet, i) => (
                           <div key={i} className="flex items-start gap-2 text-xs text-slate-700 bg-slate-50 p-2.5 rounded-lg border border-slate-100">
                             <span className="font-mono font-bold text-indigo-600 mt-0.5">{i + 1}.</span>
                             <span className="leading-relaxed">{tenet}</span>
@@ -308,7 +309,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                     <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col">
                       <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 mb-3">
                         <GitFork className="w-4 h-4 text-emerald-600" />
-                        Decision & Reversibility Heuristics
+                        Everyday Decision Heuristics
                       </h3>
                       <div className="space-y-2.5 flex-1">
                         {narrative.decision_heuristics?.map((rule, i) => (
@@ -327,7 +328,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                     <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
                       <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 mb-3">
                         <Brain className="w-4 h-4 text-rose-600" />
-                        Interpersonal & Radical Candor Rules
+                        Relationships & Honest Communication
                       </h3>
                       <div className="space-y-2.5">
                         {narrative.interpersonal_communication_rules?.map((rule, i) => (
@@ -339,11 +340,11 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                       </div>
                     </div>
 
-                    {/* Crisis Playbook */}
+                    {/* Stress Playbook */}
                     <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
                       <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2 mb-3">
                         <Flame className="w-4 h-4 text-amber-600" />
-                        Stress & P0 Incident Playbook
+                        Patience & Emotional Calm Under Pressure
                       </h3>
                       <div className="space-y-2.5">
                         {narrative.stress_and_crisis_playbook?.map((rule, i) => (
@@ -360,7 +361,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                   <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
                     <h3 className="text-sm font-bold text-rose-700 flex items-center gap-2 mb-3">
                       <ShieldAlert className="w-4 h-4 text-rose-600" />
-                      Unacceptable Anti-Patterns & Rejections
+                      Unacceptable Anti-Patterns & Boundaries
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                       {narrative.unacceptable_anti_patterns?.map((anti, i) => (
@@ -383,10 +384,10 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
                   <div>
                     <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
                       <Terminal className="w-5 h-5 text-indigo-600" />
-                      Compiled LoRA / Model System Directive
+                      Personal AI Companion System Directive
                     </h2>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      This exact instruction block is injected as the conditioning prompt for Sambit's adapted model instances.
+                      This system prompt configures any AI assistant or chatbot to respond exactly in Sambit's authentic voice, values, and decision style.
                     </p>
                   </div>
 
@@ -410,7 +411,7 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
 
                 <div className="bg-slate-900 text-slate-200 rounded-xl p-5 font-mono text-xs leading-relaxed overflow-x-auto whitespace-pre-wrap border border-slate-800">
                   {narrative?.system_prompt_directive || 
-                    "You are an AI modeled on Sambit's cognitive and engineering persona. When presented with dilemmas, reason from first principles, evaluate reversibility immediately, prioritize high execution velocity, cut non-essential scope, and communicate with radical clarity, brevity, and technical rigor."}
+                    "You are a personal digital twin calibrated to replicate the exact decision-making philosophy, personal values, emotional temperament, and communication style of Sambit. Speak in a warm, grounded, authentic human voice, prioritize honesty and peace of mind, and reject superficial drama."}
                 </div>
               </div>
             </div>

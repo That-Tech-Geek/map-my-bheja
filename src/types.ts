@@ -429,11 +429,12 @@ export interface BehavioralNarrative {
   archetype_title: string;
   executive_summary: string;
   cognitive_dna_summary: string;
-  core_engineering_tenets: string[];
-  decision_heuristics: string[];
-  interpersonal_communication_rules: string[];
-  stress_and_crisis_playbook: string[];
-  unacceptable_anti_patterns: string[];
+  core_engineering_tenets?: string[];
+  core_life_tenets?: string[];
+  decision_heuristics?: string[];
+  interpersonal_communication_rules?: string[];
+  stress_and_crisis_playbook?: string[];
+  unacceptable_anti_patterns?: string[];
   system_prompt_directive: string;
   generated_at: string;
 }
