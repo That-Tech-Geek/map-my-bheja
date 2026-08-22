@@ -26,8 +26,8 @@ interface ParameterEngineProps {
   state: FullCognitiveState;
   onUpdateParameter: (key: PersonalityParameterKey, value: number) => void;
   onSynthesizeNarrative: () => void;
-  onNavigateToFineTuning: () => void;
-  isSynthesizing: boolean;
+  onNavigateToExport: () => void;
+  isSynthesizing?: boolean;
 }
 
 const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string }> = {
@@ -44,8 +44,8 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
   state,
   onUpdateParameter,
   onSynthesizeNarrative,
-  onNavigateToFineTuning,
-  isSynthesizing,
+  onNavigateToExport,
+  isSynthesizing = false,
 }) => {
   const [copiedDirective, setCopiedDirective] = useState(false);
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState<string>('all');
@@ -101,15 +101,15 @@ export const ParameterEngine: React.FC<ParameterEngineProps> = ({
               className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5 disabled:opacity-50"
             >
               <Sparkles className="w-4 h-4" />
-              <span>{isSynthesizing ? 'Synthesizing Narrative...' : 'Re-Synthesize Narrative'}</span>
+              <span>{isSynthesizing ? 'Recalculating Profile...' : 'Recalculate Profile'}</span>
             </button>
 
             <button
-              onClick={onNavigateToFineTuning}
+              onClick={onNavigateToExport}
               className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5"
             >
               <Zap className="w-4 h-4" />
-              <span>Launch Fine-Tuning Run</span>
+              <span>Export LLM Dataset Hub</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

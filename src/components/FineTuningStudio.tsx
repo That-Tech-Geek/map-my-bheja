@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { FullCognitiveState, FineTuningConfig, FineTuningRun } from '../types';
 import { simulateFineTuningRun, testPromptComparison } from '../services/api';
+import { FineTuningExportModal } from './FineTuningExportModal';
 
 interface FineTuningStudioProps {
   state: FullCognitiveState;
@@ -73,6 +74,7 @@ export const FineTuningStudio: React.FC<FineTuningStudioProps> = ({
   const [isRunning, setIsRunning] = useState(false);
   const [activeRun, setActiveRun] = useState<FineTuningRun | null>(state.latest_finetuning_run || null);
   const [activeTab, setActiveTab] = useState<'runs' | 'telemetry' | 'playground' | 'config'>('playground');
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
   // Custom prompt comparison playground state
   const [customPrompt, setCustomPrompt] = useState('');
@@ -160,6 +162,14 @@ export const FineTuningStudio: React.FC<FineTuningStudioProps> = ({
           </div>
 
           <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              onClick={() => setIsExportModalOpen(true)}
+              className="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-bold shadow-xs transition flex items-center gap-1.5"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Export LLM Dataset Hub</span>
+            </button>
+
             <button
               onClick={handleLaunchFineTuning}
               disabled={isRunning}
@@ -601,6 +611,13 @@ export const FineTuningStudio: React.FC<FineTuningStudioProps> = ({
           )}
         </div>
       </div>
+
+      {/* Fine-Tuning Export Modal */}
+      <FineTuningExportModal
+        state={state}
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+      />
     </div>
   );
 };

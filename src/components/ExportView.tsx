@@ -14,6 +14,7 @@ import {
   downloadFile, 
   downloadFullDatasetZip 
 } from '../services/storage';
+import { FineTuningExportModal } from './FineTuningExportModal';
 
 interface ExportViewProps {
   state: FullCognitiveState;
@@ -27,6 +28,7 @@ export const ExportView: React.FC<ExportViewProps> = ({
   const [selectedFileKey, setSelectedFileKey] = useState<keyof DatasetVersion['export_files']>('training_all');
   const [copied, setCopied] = useState(false);
   const [isGeneratingVersion, setIsGeneratingVersion] = useState(false);
+  const [isFineTuningModalOpen, setIsFineTuningModalOpen] = useState(false);
 
   // Compute live current version preview
   const liveVersion = buildDatasetVersion(state);
@@ -152,6 +154,14 @@ export const ExportView: React.FC<ExportViewProps> = ({
         </div>
 
         <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => setIsFineTuningModalOpen(true)}
+            className="px-3.5 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-2xs"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>Export LLM Dataset Hub (JSONL / Unsloth)</span>
+          </button>
+
           <button
             onClick={handleCreateNewVersion}
             disabled={isGeneratingVersion}
@@ -324,6 +334,12 @@ export const ExportView: React.FC<ExportViewProps> = ({
 
       </div>
 
+      {/* LLM Fine-Tuning Multi-Format Export Modal */}
+      <FineTuningExportModal
+        state={state}
+        isOpen={isFineTuningModalOpen}
+        onClose={() => setIsFineTuningModalOpen(false)}
+      />
     </div>
   );
 };

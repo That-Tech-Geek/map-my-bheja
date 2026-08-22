@@ -814,18 +814,29 @@ export function computeParametersFromLikert(
 
   for (const q of LIKERT_500_QUESTIONS) {
     const rawVal = responses[q.id];
-    // If not answered yet, use the parameter's default baseline converted to 1..5 scale (3 is neutral)
-    const effectiveVal = rawVal !== undefined 
-      ? rawVal 
-      : (PARAMETER_METADATA[q.mapped_parameter]?.default_baseline ? 1 + (PARAMETER_METADATA[q.mapped_parameter].default_baseline / 100) * 4 : 3);
+    let normalized = 0.5; // Default neutral (0.0 to 1.0)
 
-    // If reversed: 5 -> 1, 4 -> 2, 3 -> 3, 2 -> 4, 1 -> 5
-    const adjustedVal = q.reversed ? (6 - effectiveVal) : effectiveVal;
+    if (rawVal !== undefined) {
+      if (rawVal > 5) {
+        // 1..7 Scale (1: Strongly Disagree, 4: Neutral, 7: Strongly Agree)
+        normalized = (rawVal - 1) / 6;
+      } else {
+        // 1..5 Scale (1: Strongly Disagree, 3: Neutral, 5: Strongly Agree)
+        normalized = (rawVal - 1) / 4;
+      }
+    } else {
+      const baseline = PARAMETER_METADATA[q.mapped_parameter]?.default_baseline ?? 50;
+      normalized = baseline / 100;
+    }
+
+    // Apply reversal if the question is inversely scored
+    const finalNormalized = q.reversed ? (1.0 - normalized) : normalized;
+    const effectiveVal = 1 + finalNormalized * 4; // Map to 1..5 standard range
 
     // Accumulate to parameter (scale: 1..5 -> 0..4)
     const pAcc = paramAccumulators[q.mapped_parameter];
     if (pAcc) {
-      pAcc.totalScore += (adjustedVal - 1) * q.weight;
+      pAcc.totalScore += (effectiveVal - 1) * q.weight;
       pAcc.maxScore += 4 * q.weight;
       pAcc.count += 1;
     }
@@ -833,7 +844,7 @@ export function computeParametersFromLikert(
     // Accumulate to domain
     const dAcc = domainAccumulators[q.domain];
     if (dAcc) {
-      dAcc.total += ((adjustedVal - 1) / 4) * 100;
+      dAcc.total += finalNormalized * 100;
       dAcc.count += 1;
     }
   }
@@ -898,67 +909,97 @@ const PARAMETRIC_KEYS: Record<PersonalityParameterKey, boolean> = {
 };
 
 /**
- * Persona Preset Generator
- * Allows instant 500-question population based on cognitive archetypes.
+ * Pure Client-Side Deterministic Behavioral Narrative Generator
+ * Generates rich system prompt directives and cognitive profiles directly from calculated parameters.
  */
-export function generatePresetLikertResponses(archetype: 'sambit_exact' | 'pragmatic_hacker' | 'rigorous_architect' | 'startup_founder' | 'academic_purist'): Record<string, number> {
-  const result: Record<string, number> = {};
+export function generateDeterministicBehavioralNarrative(
+  paramMap: Record<PersonalityParameterKey, number>,
+  userName: string = 'Sambit'
+): import('../types').BehavioralNarrative {
+  const vel = paramMap.velocity_bias ?? 50;
+  const candor = paramMap.candor_directness ?? 50;
+  const firstPrinc = paramMap.first_principles_ratio ?? 50;
+  const rev = paramMap.reversibility_sensitivity ?? 50;
+  const autonomy = paramMap.autonomy_preference ?? 50;
+  const formal = paramMap.formalism_weight ?? 50;
+  const scope = paramMap.scope_ruthlessness ?? 50;
+  const stress = paramMap.stress_neutrality ?? 50;
+  const abst = paramMap.abstraction_tolerance ?? 50;
+  const techDebt = paramMap.technical_debt_tolerance ?? 50;
 
-  for (const q of LIKERT_500_QUESTIONS) {
-    let score = 3; // Neutral default
-
-    if (archetype === 'sambit_exact') {
-      // Sambit's true cognitive profile: High velocity, strict reversibility awareness, first-principles, high candor, extreme autonomy, low abstraction tolerance
-      const key = q.mapped_parameter;
-      if (['velocity_bias', 'first_principles_ratio', 'autonomy_preference', 'rabbit_hole_curiosity', 'candor_directness', 'scope_ruthlessness', 'reversibility_sensitivity'].includes(key)) {
-        score = q.reversed ? 1 : 5;
-      } else if (['epistemic_plasticity', 'pragmatic_empiricism', 'stress_neutrality', 'failure_transparency'].includes(key)) {
-        score = q.reversed ? 1 : 5;
-      } else if (key === 'abstraction_tolerance') {
-        score = q.reversed ? 5 : 2; // Prefers concrete simplicity
-      } else if (key === 'formalism_weight') {
-        score = q.reversed ? 2 : 4; // High on typing/contracts, low on bureaucracy
-      } else {
-        score = q.reversed ? 2 : 4;
-      }
-    } else if (archetype === 'pragmatic_hacker') {
-      const key = q.mapped_parameter;
-      if (['velocity_bias', 'technical_debt_tolerance', 'scope_ruthlessness'].includes(key)) {
-        score = q.reversed ? 1 : 5;
-      } else if (['formalism_weight'].includes(key)) {
-        score = q.reversed ? 5 : 2;
-      } else {
-        score = q.reversed ? 2 : 4;
-      }
-    } else if (archetype === 'rigorous_architect') {
-      const key = q.mapped_parameter;
-      if (['formalism_weight', 'craft_perfectionism', 'abstraction_tolerance'].includes(key)) {
-        score = q.reversed ? 1 : 5;
-      } else if (['technical_debt_tolerance', 'velocity_bias'].includes(key)) {
-        score = q.reversed ? 5 : 2;
-      } else {
-        score = q.reversed ? 2 : 4;
-      }
-    } else if (archetype === 'startup_founder') {
-      const key = q.mapped_parameter;
-      if (['velocity_bias', 'risk_tolerance', 'crisis_decisiveness', 'scope_ruthlessness'].includes(key)) {
-        score = q.reversed ? 1 : 5;
-      } else {
-        score = q.reversed ? 2 : 4;
-      }
-    } else if (archetype === 'academic_purist') {
-      const key = q.mapped_parameter;
-      if (['first_principles_ratio', 'rabbit_hole_curiosity', 'formalism_weight'].includes(key)) {
-        score = q.reversed ? 1 : 5;
-      } else if (['velocity_bias', 'technical_debt_tolerance'].includes(key)) {
-        score = q.reversed ? 5 : 1;
-      } else {
-        score = q.reversed ? 2 : 4;
-      }
-    }
-
-    result[q.id] = score;
+  // Derive archetype title
+  let archetypeTitle = 'Pragmatic Systems Engineer & Strategist';
+  if (vel > 75 && scope > 70) {
+    archetypeTitle = 'High-Velocity Pragmatic Builder & Radical Simplifier';
+  } else if (firstPrinc > 75 && formal > 70) {
+    archetypeTitle = 'First-Principles Technical Architect & Systems Thinker';
+  } else if (autonomy > 80 && candor > 75) {
+    archetypeTitle = 'Autonomous Operator & Direct Execution Leader';
   }
 
-  return result;
+  const tenets: string[] = [
+    vel > 65 ? 'Bias for action: A working prototype today beats a theoretical blueprint next week.' : 'Deliberate quality: System correctness and clean contracts take priority over rushed code.',
+    abst < 45 ? 'Concrete over abstract: Prefer explicit, duplicated code over premature generic abstractions.' : 'Modularity: Build decoupled abstractions with strict interface isolation.',
+    techDebt > 60 ? 'Pragmatic technical debt: Accept temporary debt when it buys strategic learning velocity.' : 'Strict hygiene: Eliminate technical debt immediately before it compounds into architectural rot.',
+    scope > 65 ? 'Ruthless scope reduction: When deadlines press, cut 40% of feature complexity rather than postponing launch.' : 'Exhaustive feature completeness: Ensure all edge cases and configurations are fully accounted for.',
+    firstPrinc > 65 ? 'First principles: Deconstruct problems to fundamental axioms before adopting conventional solutions.' : 'Empirical benchmark: Rely on proven battle-tested patterns and established industry standards.',
+  ];
+
+  const heuristics: string[] = [
+    rev > 65 ? 'Type 1 vs Type 2 decisions: Reversible two-way doors are decided in minutes; irreversible one-way doors get rigorous stress testing.' : 'Uniform rigor: Apply disciplined multi-criteria decision matrices across major and minor forks.',
+    'Identify the single binding constraint; optimizing non-bottleneck steps is an illusion of progress.',
+    candor > 65 ? 'Direct radical candor: Disagree cleanly with objective technical reasoning without diplomatic ambiguity.' : 'Consensus building: Socialize proposals early and align stakeholder sentiment iteratively.',
+    stress > 65 ? 'Incident equanimity: Treat production outages and critical shifts with calm, analytical root-cause triage.' : 'Urgent mobilization: Escalate rapidly and swarm critical incidents immediately.',
+  ];
+
+  const commRules: string[] = [
+    candor > 60 ? 'Speak directly without corporate jargon or evasive hedging.' : 'Frame feedback constructively with diplomatic balance.',
+    'Lead with the conclusion and key recommendation in the first two sentences.',
+    'Demand concrete evidence, reproducing test cases, or telemetry rather than subjective assertions.',
+    'Normalize rapid disagreement and constructive intellectual pushback.',
+  ];
+
+  const playbook: string[] = [
+    'Freeze speculative changes; isolate failure blast radiuses with kill switches.',
+    'Perform binary search bisection on recent deployments to isolate regressions.',
+    'Communicate transparent status logs externally every 30 minutes during outages.',
+    'Conduct blameless post-mortems focused strictly on systemic root causes and automated preventions.',
+  ];
+
+  const antiPatterns: string[] = [
+    'Premature abstraction and unnecessary multi-layered boilerplate.',
+    'Prolonged consensus meetings for low-stakes, easily reversible choices.',
+    'Sugarcoating architectural flaws to preserve comfort over code health.',
+    'Gold-plating non-critical features while core revenue and user flows remain unvalidated.',
+  ];
+
+  const systemDirective = `You are a fine-tuned digital twin calibrated to replicate the exact decision-making, engineering philosophy, and communication style of ${userName}.
+
+CORE COGNITIVE PARAMETERS:
+- Velocity Bias: ${vel}/100 (${vel > 50 ? 'Prefers rapid iteration and MVP shipment' : 'Prefers thorough validation'})
+- Candor & Directness: ${candor}/100 (${candor > 50 ? 'Radical directness, zero corporate fluff' : 'Balanced diplomacy'})
+- First-Principles Ratio: ${firstPrinc}/100 (${firstPrinc > 50 ? 'Reasons from fundamental axioms' : 'Reasons from precedent'})
+- Reversibility Sensitivity: ${rev}/100 (Strict Type 1 vs Type 2 decision categorization)
+- Autonomy Preference: ${autonomy}/100 (Extreme agency and independent problem solving)
+- Scope Ruthlessness: ${scope}/100 (Aggressively trims unnecessary requirements)
+
+BEHAVIORAL RULES:
+1. Always state your bottom line first.
+2. Break technical choices into trade-offs (Latency, Complexity, Velocity, Reversibility).
+3. If an abstraction is unnecessary, advise against it.
+4. Answer with technical clarity, rigorous pragmatism, and direct conviction.`;
+
+  return {
+    archetype_title: archetypeTitle,
+    executive_summary: `${userName}'s calibrated cognitive profile reflects a score of ${vel}/100 in execution velocity, ${candor}/100 in communicative candor, and ${firstPrinc}/100 in first-principles decomposition. Decision boundaries emphasize rapid execution on reversible paths while maintaining strict architectural safeguards on immutable contracts.`,
+    cognitive_dna_summary: `Operating philosophy centers on pragmatic empiricism, fast feedback cycles, and radical clarity. Avoids theoretical over-engineering in favor of clean, observable software systems.`,
+    core_engineering_tenets: tenets,
+    decision_heuristics: heuristics,
+    interpersonal_communication_rules: commRules,
+    stress_and_crisis_playbook: playbook,
+    unacceptable_anti_patterns: antiPatterns,
+    system_prompt_directive: systemDirective,
+    generated_at: new Date().toISOString(),
+  };
 }
+
