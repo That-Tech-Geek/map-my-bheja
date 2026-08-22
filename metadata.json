@@ -1,6 +1,6 @@
 {
   "name": "Cognitive Apprenticeship — Identity Dataset Builder",
-  "description": "500-question personal life and decision-making psychometric assessment and cognitive profile builder using a 16Personalities-style Likert scale.",
+  "description": "Decision-policy distillation platform converting 500 trade-off scenarios into deterministic SFT & DPO training datasets, evaluation sets, and adversarial stress tests.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

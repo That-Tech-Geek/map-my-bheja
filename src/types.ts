@@ -1,9 +1,127 @@
 /**
- * Cognitive Apprenticeship — Identity Dataset Builder
- * Global Type Definitions
+ * Cognitive Apprenticeship — Decision-Policy Distillation Architecture
+ * Canonical Source-of-Truth Type Definitions
  */
 
 export type SpeakerRole = 'user' | 'interviewer';
+
+// ---------------------------------------------------------------------------
+// Canonical Decision-Policy Distillation Schema (Source of Truth)
+// ---------------------------------------------------------------------------
+
+export type DecisionCategory = 
+  | 'autonomy_and_time'
+  | 'risk_and_money'
+  | 'craft_vs_speed'
+  | 'candor_and_relations'
+  | 'curiosity_and_depth'
+  | 'ambition_and_lifestyle'
+  | 'ethics_and_boundaries'
+  | 'simplicity_vs_power'
+  | 'independence_vs_consensus'
+  | 'adversity_and_resilience';
+
+export interface DecisionScenario {
+  id: string; // e.g. "autonomy_001", "risk_015"
+  category: DecisionCategory;
+  scenario: string; // The situation / dilemma
+  option_a: string; // Option A text
+  option_b: string; // Option B text
+  tags?: string[];
+  is_held_out?: boolean; // Reserved for zero-leakage evaluation (never trained on)
+  competing_rationale_a?: string; // Strongest competing reasoning for Option A
+  competing_rationale_b?: string; // Strongest competing reasoning for Option B
+}
+
+export interface DecisionResponse {
+  id: string; // Scenario ID
+  choice: 'A' | 'B';
+  reasoning: string; // What Sambit actually said
+  confidence: number; // 1 to 5 scale
+  boundary_condition?: string; // "I'd reconsider if..."
+  importance?: number; // 1 to 5 scale
+  timestamp: string;
+}
+
+export interface AdversarialScenario {
+  id: string; // e.g. "adv_autonomy_001_p1"
+  base_scenario_id: string;
+  category: DecisionCategory;
+  title: string;
+  progression_level: number; // 1 to 4 boundary escalation ladder
+  scenario: string;
+  option_a: string;
+  option_b: string;
+  boundary_test_target: string; // What boundary variable is being stressed
+}
+
+export interface FailureLogRecord {
+  id: string;
+  scenario_id: string;
+  scenario_text: string;
+  model_answer: string;
+  sambit_answer: string;
+  correction: string;
+  reason: string; // e.g. "The model overgeneralized autonomy preference."
+  timestamp: string;
+}
+
+export interface EvaluationRecord {
+  scenario_id: string;
+  model_choice?: 'A' | 'B';
+  sambit_choice: 'A' | 'B';
+  decision_matched: boolean;
+  values_alignment: number; // 1 to 10 scale
+  tradeoff_alignment: number; // 1 to 10 scale
+  boundary_alignment: number; // 1 to 10 scale
+  tone_alignment: number; // 1 to 10 scale
+  notes?: string;
+  timestamp: string;
+}
+
+// ---------------------------------------------------------------------------
+// Deterministic SFT & DPO Compiler Types
+// ---------------------------------------------------------------------------
+
+export interface SFTRecord {
+  messages: Array<{
+    role: 'user' | 'assistant';
+    content: string;
+  }>;
+  metadata?: {
+    scenario_id: string;
+    category: string;
+    confidence?: number;
+    importance?: number;
+  };
+}
+
+export interface DPORecord {
+  prompt: string;
+  chosen: string;
+  rejected: string;
+  metadata?: {
+    scenario_id: string;
+    category: string;
+    confidence?: number;
+    importance?: number;
+  };
+}
+
+export interface DatasetValidationReport {
+  totalScenarios: number;
+  totalAnswered: number;
+  completionRate: number;
+  trainCount: number;
+  heldOutCount: number;
+  missingReasoningCount: number;
+  missingBoundaryCount: number;
+  leakageDetected: boolean;
+  leakageScenarioIds: string[];
+  categoryBreakdown: Record<string, { total: number; answered: number; aCount: number; bCount: number }>;
+  averageConfidence: number;
+  averageImportance: number;
+}
 
 export interface DisconfirmingProbe {
   target_hypothesis: string;
@@ -542,6 +660,14 @@ export interface SessionSentimentProfile {
 
 export interface FullCognitiveState {
   user_name: string;
+  // Canonical Decision-Policy Distillation State
+  decision_responses?: Record<string, DecisionResponse>; // scenario_id -> DecisionResponse
+  adversarial_responses?: Record<string, DecisionResponse>; // adv_id -> DecisionResponse
+  evaluation_records?: Record<string, EvaluationRecord>; // scenario_id -> EvaluationRecord
+  failure_logs?: FailureLogRecord[]; // List of recorded failures & corrections
+  custom_held_out_ids?: string[]; // Overridden held-out test scenario IDs
+  
+  // Legacy / Baseline records
   sessions: SessionRecord[];
   active_session_id: string;
   messages: Record<string, ChatMessage[]>; // session_id -> messages
@@ -555,13 +681,11 @@ export interface FullCognitiveState {
   training_examples: TrainingExampleItem[];
   dataset_versions: DatasetVersion[];
   last_analysis_timestamp?: string;
-  // 500 Likert Assessment & Parameter Mapping
-  likert_responses?: Record<string, number>; // question_id -> 1..5
+  likert_responses?: Record<string, number>; // Baseline comparison
   computed_parameters?: Record<PersonalityParameterKey, number>;
   behavioral_narrative?: BehavioralNarrative;
   finetuning_runs?: FineTuningRun[];
   active_finetuning_run_id?: string;
-  // Sentiment & Emotional Response Tracking
   sentiment_sessions?: SessionSentimentProfile[];
 }
 
